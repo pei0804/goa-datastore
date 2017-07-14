@@ -280,7 +280,7 @@ paths:
             type: file
       schemes:
       - http
-      summary: Download swagger/swagger.json
+      summary: Download ../swagger/swagger.json
   /swagger/{filepath}:
     get:
       operationId: swagger#/swagger/*filepath
@@ -301,7 +301,7 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - http
-      summary: Download public/swagger/
+      summary: Download ../static/swagger/
 produces:
 - application/json
 - application/xml

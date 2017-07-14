@@ -5,3 +5,11 @@ api_version: go1.8
 handlers:
 - url: /.*
   script: _go_app
+
+#- url: /
+#  static_files: static/swagger/index.html
+#  upload: static/swagger/index.html
+#
+#- url: /swagger.json
+#  static_files: swagger.json
+#  upload: swagger.json

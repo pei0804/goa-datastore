@@ -12,18 +12,17 @@ var _ = API("appengine", func() {
 	Scheme("http")
 	BasePath("/")
 	Origin("*", func() {
-		Methods("GET", "POST", "PUT", "DELETE")
+		Methods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 		MaxAge(600)
 		Credentials()
 	})
 })
 var _ = Resource("swagger", func() {
-
 	Origin("*", func() {
 		Methods("GET")
 	})
-	Files("/swagger.json", "swagger/swagger.json")
-	Files("/swagger/*filepath", "public/swagger/")
+	Files("swagger.json", "../swagger/swagger.json")
+	Files("swagger/*filepath", "../static/swagger/")
 })
 
 var Account = MediaType("application/vnd.account+json", func() {

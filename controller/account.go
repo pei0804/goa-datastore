@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/goadesign/goa"
 	"github.com/tikasan/goa-datastore/app"
+	"github.com/tikasan/goa-datastore/model"
 )
 
 // AccountController implements the Account resource.
@@ -20,6 +23,14 @@ func (c *AccountController) Create(ctx *app.CreateAccountContext) error {
 	// AccountController_Create: start_implement
 
 	// Put your logic here
+	a := model.Account{
+		Name: ctx.Payload.Name,
+	}
+	adb := model.AccountDB{}
+	err := adb.Add(ctx, &a)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 
 	// AccountController_Create: end_implement
 	res := &app.Account{}
@@ -53,9 +64,15 @@ func (c *AccountController) Show(ctx *app.ShowAccountContext) error {
 	// AccountController_Show: start_implement
 
 	// Put your logic here
+	adb := model.AccountDB{}
+	a, err := adb.Get(ctx, ctx.ID)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 
 	// AccountController_Show: end_implement
 	res := &app.Account{}
+	fmt.Println(a)
 	return ctx.OK(res)
 }
 

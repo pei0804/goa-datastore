@@ -164,7 +164,7 @@ func handleAccountOrigin(h goa.Handler) goa.Handler {
 			rw.Header().Set("Access-Control-Allow-Credentials", "true")
 			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
-				rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 			}
 			return h(ctx, rw, req)
 		}
@@ -231,20 +231,20 @@ func MountSwaggerController(service *goa.Service, ctrl SwaggerController) {
 	service.Mux.Handle("OPTIONS", "/swagger/*filepath", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/swagger.json", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
 
-	h = ctrl.FileHandler("/swagger/*filepath", "public/swagger/")
+	h = ctrl.FileHandler("/swagger/*filepath", "../static/swagger/")
 	h = handleSwaggerOrigin(h)
 	service.Mux.Handle("GET", "/swagger/*filepath", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swagger/", "route", "GET /swagger/*filepath")
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "../static/swagger/", "route", "GET /swagger/*filepath")
 
-	h = ctrl.FileHandler("/swagger.json", "swagger/swagger.json")
+	h = ctrl.FileHandler("/swagger.json", "../swagger/swagger.json")
 	h = handleSwaggerOrigin(h)
 	service.Mux.Handle("GET", "/swagger.json", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Swagger", "files", "swagger/swagger.json", "route", "GET /swagger.json")
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "../swagger/swagger.json", "route", "GET /swagger.json")
 
-	h = ctrl.FileHandler("/swagger/", "public/swagger/index.html")
+	h = ctrl.FileHandler("/swagger/", "../static/swagger/index.html")
 	h = handleSwaggerOrigin(h)
 	service.Mux.Handle("GET", "/swagger/", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swagger/index.html", "route", "GET /swagger/")
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "../static/swagger/index.html", "route", "GET /swagger/")
 }
 
 // handleSwaggerOrigin applies the CORS response headers corresponding to the origin.
