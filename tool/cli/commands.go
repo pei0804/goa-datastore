@@ -4,8 +4,8 @@
 //
 // Command:
 // $ goagen
-// --design=github.com/tikasan/goa-datastore/design
-// --out=$(GOPATH)/src/github.com/tikasan/goa-datastore
+// --design=github.com/pei0804/goa-datastore/design
+// --out=$(GOPATH)/src/github.com/pei0804/goa-datastore
 // --version=v1.2.0-dirty
 
 package cli
@@ -17,8 +17,8 @@ import (
 	"github.com/goadesign/goa"
 	goaclient "github.com/goadesign/goa/client"
 	uuid "github.com/goadesign/goa/uuid"
+	"github.com/pei0804/goa-datastore/client"
 	"github.com/spf13/cobra"
-	"github.com/tikasan/goa-datastore/client"
 	"log"
 	"os"
 	"path"
@@ -28,42 +28,40 @@ import (
 )
 
 type (
-	// CreateAccountCommand is the command line data structure for the create action of Account
-	CreateAccountCommand struct {
+	// CreateUserCommand is the command line data structure for the create action of User
+	CreateUserCommand struct {
 		Payload     string
 		ContentType string
 		PrettyPrint bool
 	}
 
-	// DeleteAccountCommand is the command line data structure for the delete action of Account
-	DeleteAccountCommand struct {
-		Payload     string
-		ContentType string
-		// id
-		ID          int
+	// DeleteUserCommand is the command line data structure for the delete action of User
+	DeleteUserCommand struct {
+		// id(int64)
+		ID          string
 		PrettyPrint bool
 	}
 
-	// ListAccountCommand is the command line data structure for the list action of Account
-	ListAccountCommand struct {
-		PrettyPrint bool
-	}
-
-	// ShowAccountCommand is the command line data structure for the show action of Account
-	ShowAccountCommand struct {
-		// id
-		ID int
+	// ListUserCommand is the command line data structure for the list action of User
+	ListUserCommand struct {
 		// name
 		Name        string
 		PrettyPrint bool
 	}
 
-	// UpdateAccountCommand is the command line data structure for the update action of Account
-	UpdateAccountCommand struct {
+	// ShowUserCommand is the command line data structure for the show action of User
+	ShowUserCommand struct {
+		// id(int64)
+		ID          string
+		PrettyPrint bool
+	}
+
+	// UpdateUserCommand is the command line data structure for the update action of User
+	UpdateUserCommand struct {
 		Payload     string
 		ContentType string
-		// id
-		ID          int
+		// id(int64)
+		ID          string
 		PrettyPrint bool
 	}
 
@@ -81,9 +79,9 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 		Use:   "create",
 		Short: `create`,
 	}
-	tmp1 := new(CreateAccountCommand)
+	tmp1 := new(CreateUserCommand)
 	sub = &cobra.Command{
-		Use:   `account ["/account"]`,
+		Use:   `user ["/users"]`,
 		Short: ``,
 		Long: `
 
@@ -102,18 +100,11 @@ Payload example:
 		Use:   "delete",
 		Short: `delete`,
 	}
-	tmp2 := new(DeleteAccountCommand)
+	tmp2 := new(DeleteUserCommand)
 	sub = &cobra.Command{
-		Use:   `account ["/account/ID"]`,
+		Use:   `user ["/users/ID"]`,
 		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "name": "John"
-}`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
 	}
 	tmp2.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp2.PrettyPrint, "pp", false, "Pretty print response body")
@@ -123,9 +114,9 @@ Payload example:
 		Use:   "list",
 		Short: `list`,
 	}
-	tmp3 := new(ListAccountCommand)
+	tmp3 := new(ListUserCommand)
 	sub = &cobra.Command{
-		Use:   `account ["/account"]`,
+		Use:   `user ["/users"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp3.Run(c, args) },
 	}
@@ -137,9 +128,9 @@ Payload example:
 		Use:   "show",
 		Short: `show`,
 	}
-	tmp4 := new(ShowAccountCommand)
+	tmp4 := new(ShowUserCommand)
 	sub = &cobra.Command{
-		Use:   `account ["/account/ID"]`,
+		Use:   `user ["/users/ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
 	}
@@ -151,9 +142,9 @@ Payload example:
 		Use:   "update",
 		Short: `update`,
 	}
-	tmp5 := new(UpdateAccountCommand)
+	tmp5 := new(UpdateUserCommand)
 	sub = &cobra.Command{
-		Use:   `account ["/account/ID"]`,
+		Use:   `user ["/users/ID"]`,
 		Short: ``,
 		Long: `
 
@@ -381,15 +372,15 @@ found:
 	return nil
 }
 
-// Run makes the HTTP request corresponding to the CreateAccountCommand command.
-func (cmd *CreateAccountCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the CreateUserCommand command.
+func (cmd *CreateUserCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/account"
+		path = "/users"
 	}
-	var payload client.CreateAccountPayload
+	var payload client.CreateUserPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {
@@ -398,7 +389,7 @@ func (cmd *CreateAccountCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.CreateAccount(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.CreateUser(ctx, path, &payload, cmd.ContentType)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -409,29 +400,22 @@ func (cmd *CreateAccountCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *CreateAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *CreateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 }
 
-// Run makes the HTTP request corresponding to the DeleteAccountCommand command.
-func (cmd *DeleteAccountCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the DeleteUserCommand command.
+func (cmd *DeleteUserCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/account/%v", cmd.ID)
-	}
-	var payload client.DeleteAccountPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
+		path = fmt.Sprintf("/users/%v", cmd.ID)
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.DeleteAccount(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.DeleteUser(ctx, path)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -442,24 +426,22 @@ func (cmd *DeleteAccountCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *DeleteAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var id int
-	cc.Flags().IntVar(&cmd.ID, "id", id, `id`)
+func (cmd *DeleteUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var id string
+	cc.Flags().StringVar(&cmd.ID, "id", id, `id(int64)`)
 }
 
-// Run makes the HTTP request corresponding to the ListAccountCommand command.
-func (cmd *ListAccountCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the ListUserCommand command.
+func (cmd *ListUserCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/account"
+		path = "/users"
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListAccount(ctx, path)
+	resp, err := c.ListUser(ctx, path, cmd.Name)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -470,55 +452,22 @@ func (cmd *ListAccountCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *ListAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-}
-
-// Run makes the HTTP request corresponding to the ShowAccountCommand command.
-func (cmd *ShowAccountCommand) Run(c *client.Client, args []string) error {
-	var path string
-	if len(args) > 0 {
-		path = args[0]
-	} else {
-		path = fmt.Sprintf("/account/%v", cmd.ID)
-	}
-	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
-	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ShowAccount(ctx, path, cmd.Name)
-	if err != nil {
-		goa.LogError(ctx, "failed", "err", err)
-		return err
-	}
-
-	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
-	return nil
-}
-
-// RegisterFlags registers the command flags with the command line.
-func (cmd *ShowAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	var id int
-	cc.Flags().IntVar(&cmd.ID, "id", id, `id`)
+func (cmd *ListUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var name string
 	cc.Flags().StringVar(&cmd.Name, "name", name, `name`)
 }
 
-// Run makes the HTTP request corresponding to the UpdateAccountCommand command.
-func (cmd *UpdateAccountCommand) Run(c *client.Client, args []string) error {
+// Run makes the HTTP request corresponding to the ShowUserCommand command.
+func (cmd *ShowUserCommand) Run(c *client.Client, args []string) error {
 	var path string
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/account/%v", cmd.ID)
-	}
-	var payload client.UpdateAccountPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
+		path = fmt.Sprintf("/users/%v", cmd.ID)
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.UpdateAccount(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.ShowUser(ctx, path)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -529,9 +478,42 @@ func (cmd *UpdateAccountCommand) Run(c *client.Client, args []string) error {
 }
 
 // RegisterFlags registers the command flags with the command line.
-func (cmd *UpdateAccountCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+func (cmd *ShowUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var id string
+	cc.Flags().StringVar(&cmd.ID, "id", id, `id(int64)`)
+}
+
+// Run makes the HTTP request corresponding to the UpdateUserCommand command.
+func (cmd *UpdateUserCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/users/%v", cmd.ID)
+	}
+	var payload client.UpdateUserPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.UpdateUser(ctx, path, &payload, cmd.ContentType)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *UpdateUserCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var id int
-	cc.Flags().IntVar(&cmd.ID, "id", id, `id`)
+	var id string
+	cc.Flags().StringVar(&cmd.ID, "id", id, `id(int64)`)
 }

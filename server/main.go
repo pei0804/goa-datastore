@@ -7,8 +7,8 @@ import (
 
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	"github.com/tikasan/goa-datastore/app"
-	"github.com/tikasan/goa-datastore/controller"
+	"github.com/pei0804/goa-datastore/app"
+	"github.com/pei0804/goa-datastore/controller"
 )
 
 func init() {
@@ -21,9 +21,9 @@ func init() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	// Mount "Account" controller
-	c := controller.NewAccountController(service)
-	app.MountAccountController(service, c)
+	// Mount "User" controller
+	c := controller.NewUserController(service)
+	app.MountUserController(service, c)
 	// Mount "swagger" controller
 	c2 := controller.NewSwaggerController(service)
 	app.MountSwaggerController(service, c2)

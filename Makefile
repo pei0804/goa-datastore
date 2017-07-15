@@ -1,6 +1,6 @@
 ##### Convenient command ######
 
-REPO:=github.com/tikasan/goa-datastore
+REPO:=github.com/pei0804/goa-datastore
 GAE_PROJECT:=projectName
 
 init: install bootstrap import

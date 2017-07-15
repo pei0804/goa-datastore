@@ -4,8 +4,8 @@
 //
 // Command:
 // $ goagen
-// --design=github.com/tikasan/goa-datastore/design
-// --out=$(GOPATH)/src/github.com/tikasan/goa-datastore
+// --design=github.com/pei0804/goa-datastore/design
+// --out=$(GOPATH)/src/github.com/pei0804/goa-datastore
 // --version=v1.2.0-dirty
 
 package app
@@ -15,8 +15,8 @@ import (
 	"strings"
 )
 
-// AccountHref returns the resource href.
-func AccountHref(id interface{}) string {
+// UserHref returns the resource href.
+func UserHref(id interface{}) string {
 	paramid := strings.TrimLeftFunc(fmt.Sprintf("%v", id), func(r rune) bool { return r == '/' })
-	return fmt.Sprintf("/account/%v", paramid)
+	return fmt.Sprintf("/users/%v", paramid)
 }

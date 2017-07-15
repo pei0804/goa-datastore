@@ -4,8 +4,8 @@
 //
 // Command:
 // $ goagen
-// --design=github.com/tikasan/goa-datastore/design
-// --out=$(GOPATH)/src/github.com/tikasan/goa-datastore
+// --design=github.com/pei0804/goa-datastore/design
+// --out=$(GOPATH)/src/github.com/pei0804/goa-datastore
 // --version=v1.2.0-dirty
 
 package client
@@ -15,36 +15,64 @@ import (
 	"net/http"
 )
 
-// Account (default view)
-//
-// Identifier: application/vnd.account+json; view=default
-type Account struct {
-	// name
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-}
-
-// DecodeAccount decodes the Account instance encoded in resp body.
-func (c *Client) DecodeAccount(resp *http.Response) (*Account, error) {
-	var decoded Account
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// AccountCollection is the media type for an array of Account (default view)
-//
-// Identifier: application/vnd.account+json; type=collection; view=default
-type AccountCollection []*Account
-
-// DecodeAccountCollection decodes the AccountCollection instance encoded in resp body.
-func (c *Client) DecodeAccountCollection(resp *http.Response) (AccountCollection, error) {
-	var decoded AccountCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
 // DecodeErrorResponse decodes the ErrorResponse instance encoded in resp body.
 func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, error) {
 	var decoded goa.ErrorResponse
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
+}
+
+// user (default view)
+//
+// Identifier: application/vnd.user+json; view=default
+type User struct {
+	// id(int64)
+	ID interface{} `form:"id" json:"id" xml:"id"`
+	// id(string)
+	IDStr string `form:"id_str" json:"id_str" xml:"id_str"`
+	// name
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// Validate validates the User media type instance.
+func (mt *User) Validate() (err error) {
+
+	if mt.IDStr == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id_str"))
+	}
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	return
+}
+
+// DecodeUser decodes the User instance encoded in resp body.
+func (c *Client) DecodeUser(resp *http.Response) (*User, error) {
+	var decoded User
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// UserCollection is the media type for an array of User (default view)
+//
+// Identifier: application/vnd.user+json; type=collection; view=default
+type UserCollection []*User
+
+// Validate validates the UserCollection media type instance.
+func (mt UserCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeUserCollection decodes the UserCollection instance encoded in resp body.
+func (c *Client) DecodeUserCollection(resp *http.Response) (UserCollection, error) {
+	var decoded UserCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
 }

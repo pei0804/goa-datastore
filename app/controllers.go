@@ -4,8 +4,8 @@
 //
 // Command:
 // $ goagen
-// --design=github.com/tikasan/goa-datastore/design
-// --out=$(GOPATH)/src/github.com/tikasan/goa-datastore
+// --design=github.com/pei0804/goa-datastore/design
+// --out=$(GOPATH)/src/github.com/pei0804/goa-datastore
 // --version=v1.2.0-dirty
 
 package app
@@ -32,22 +32,22 @@ func initService(service *goa.Service) {
 	service.Decoder.Register(goa.NewJSONDecoder, "*/*")
 }
 
-// AccountController is the controller interface for the Account actions.
-type AccountController interface {
+// UserController is the controller interface for the User actions.
+type UserController interface {
 	goa.Muxer
-	Create(*CreateAccountContext) error
-	Delete(*DeleteAccountContext) error
-	List(*ListAccountContext) error
-	Show(*ShowAccountContext) error
-	Update(*UpdateAccountContext) error
+	Create(*CreateUserContext) error
+	Delete(*DeleteUserContext) error
+	List(*ListUserContext) error
+	Show(*ShowUserContext) error
+	Update(*UpdateUserContext) error
 }
 
-// MountAccountController "mounts" a Account resource controller on the given service.
-func MountAccountController(service *goa.Service, ctrl AccountController) {
+// MountUserController "mounts" a User resource controller on the given service.
+func MountUserController(service *goa.Service, ctrl UserController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/account", ctrl.MuxHandler("preflight", handleAccountOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/account/:id", ctrl.MuxHandler("preflight", handleAccountOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/users", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/users/:id", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -55,21 +55,21 @@ func MountAccountController(service *goa.Service, ctrl AccountController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewCreateAccountContext(ctx, req, service)
+		rctx, err := NewCreateUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*CreateAccountPayload)
+			rctx.Payload = rawPayload.(*CreateUserPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
 		return ctrl.Create(rctx)
 	}
-	h = handleAccountOrigin(h)
-	service.Mux.Handle("POST", "/account", ctrl.MuxHandler("create", h, unmarshalCreateAccountPayload))
-	service.LogInfo("mount", "ctrl", "Account", "action", "Create", "route", "POST /account")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/users", ctrl.MuxHandler("create", h, unmarshalCreateUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "Create", "route", "POST /users")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -77,21 +77,15 @@ func MountAccountController(service *goa.Service, ctrl AccountController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewDeleteAccountContext(ctx, req, service)
+		rctx, err := NewDeleteUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*DeleteAccountPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
 		return ctrl.Delete(rctx)
 	}
-	h = handleAccountOrigin(h)
-	service.Mux.Handle("DELETE", "/account/:id", ctrl.MuxHandler("delete", h, unmarshalDeleteAccountPayload))
-	service.LogInfo("mount", "ctrl", "Account", "action", "Delete", "route", "DELETE /account/:id")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("DELETE", "/users/:id", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "Delete", "route", "DELETE /users/:id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -99,15 +93,15 @@ func MountAccountController(service *goa.Service, ctrl AccountController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewListAccountContext(ctx, req, service)
+		rctx, err := NewListUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		return ctrl.List(rctx)
 	}
-	h = handleAccountOrigin(h)
-	service.Mux.Handle("GET", "/account", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Account", "action", "List", "route", "GET /account")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/users", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "List", "route", "GET /users")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -115,15 +109,15 @@ func MountAccountController(service *goa.Service, ctrl AccountController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewShowAccountContext(ctx, req, service)
+		rctx, err := NewShowUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		return ctrl.Show(rctx)
 	}
-	h = handleAccountOrigin(h)
-	service.Mux.Handle("GET", "/account/:id", ctrl.MuxHandler("show", h, nil))
-	service.LogInfo("mount", "ctrl", "Account", "action", "Show", "route", "GET /account/:id")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/users/:id", ctrl.MuxHandler("show", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "Show", "route", "GET /users/:id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -131,25 +125,25 @@ func MountAccountController(service *goa.Service, ctrl AccountController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewUpdateAccountContext(ctx, req, service)
+		rctx, err := NewUpdateUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*UpdateAccountPayload)
+			rctx.Payload = rawPayload.(*UpdateUserPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
 		return ctrl.Update(rctx)
 	}
-	h = handleAccountOrigin(h)
-	service.Mux.Handle("PUT", "/account/:id", ctrl.MuxHandler("update", h, unmarshalUpdateAccountPayload))
-	service.LogInfo("mount", "ctrl", "Account", "action", "Update", "route", "PUT /account/:id")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("PUT", "/users/:id", ctrl.MuxHandler("update", h, unmarshalUpdateUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "Update", "route", "PUT /users/:id")
 }
 
-// handleAccountOrigin applies the CORS response headers corresponding to the origin.
-func handleAccountOrigin(h goa.Handler) goa.Handler {
+// handleUserOrigin applies the CORS response headers corresponding to the origin.
+func handleUserOrigin(h goa.Handler) goa.Handler {
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -173,9 +167,9 @@ func handleAccountOrigin(h goa.Handler) goa.Handler {
 	}
 }
 
-// unmarshalCreateAccountPayload unmarshals the request body into the context request data Payload field.
-func unmarshalCreateAccountPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &createAccountPayload{}
+// unmarshalCreateUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalCreateUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &createUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -188,24 +182,9 @@ func unmarshalCreateAccountPayload(ctx context.Context, service *goa.Service, re
 	return nil
 }
 
-// unmarshalDeleteAccountPayload unmarshals the request body into the context request data Payload field.
-func unmarshalDeleteAccountPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &deleteAccountPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
-}
-
-// unmarshalUpdateAccountPayload unmarshals the request body into the context request data Payload field.
-func unmarshalUpdateAccountPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &updateAccountPayload{}
+// unmarshalUpdateUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &updateUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

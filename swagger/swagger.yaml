@@ -4,8 +4,7 @@ consumes:
 - application/gob
 - application/x-gob
 definitions:
-  Account:
-    description: Account (default view)
+  CreateUserPayload:
     example:
       name: John
     properties:
@@ -13,54 +12,59 @@ definitions:
         description: name
         example: John
         type: string
-    title: 'Mediatype identifier: application/vnd.account+json; view=default'
+    required:
+    - name
+    title: CreateUserPayload
     type: object
-  AccountCollection:
-    description: AccountCollection is the media type for an array of Account (default
-      view)
+  UpdateUserPayload:
     example:
-    - name: John
-    - name: John
+      name: John
+    properties:
+      name:
+        description: name
+        example: John
+        type: string
+    required:
+    - name
+    title: UpdateUserPayload
+    type: object
+  User:
+    description: user (default view)
+    example:
+      id: 4.9096287e+15
+      id_str: "4909628655665152"
+      name: John
+    properties:
+      id:
+        description: id(int64)
+        example: 4.9096287e+15
+      id_str:
+        description: id(string)
+        example: "4909628655665152"
+        type: string
+      name:
+        description: name
+        example: John
+        type: string
+    required:
+    - id
+    - id_str
+    - name
+    title: 'Mediatype identifier: application/vnd.user+json; view=default'
+    type: object
+  UserCollection:
+    description: UserCollection is the media type for an array of User (default view)
+    example:
+    - id: 4.9096287e+15
+      id_str: "4909628655665152"
+      name: John
+    - id: 4.9096287e+15
+      id_str: "4909628655665152"
+      name: John
     items:
-      $ref: '#/definitions/Account'
-    title: 'Mediatype identifier: application/vnd.account+json; type=collection; view=default'
+      $ref: '#/definitions/User'
+    title: 'Mediatype identifier: application/vnd.user+json; type=collection; view=default'
     type: array
-  CreateAccountPayload:
-    example:
-      name: John
-    properties:
-      name:
-        description: name
-        example: John
-        type: string
-    required:
-    - name
-    title: CreateAccountPayload
-    type: object
-  DeleteAccountPayload:
-    example:
-      name: John
-    properties:
-      name:
-        description: name
-        example: John
-        type: string
-    required:
-    - name
-    title: DeleteAccountPayload
-    type: object
-  UpdateAccountPayload:
-    example:
-      name: John
-    properties:
-      name:
-        description: name
-        example: John
-        type: string
-    required:
-    - name
-    title: UpdateAccountPayload
-    type: object
   error:
     description: Error response media type (default view)
     example:
@@ -104,172 +108,6 @@ info:
   title: The appengine example
   version: ""
 paths:
-  /account:
-    get:
-      description: list
-      operationId: Account#list
-      produces:
-      - application/vnd.goa.error
-      - application/vnd.goa.error
-      - application/vnd.account+json; type=collection
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/AccountCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: list Account
-      tags:
-      - Account
-    post:
-      description: create
-      operationId: Account#create
-      parameters:
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/CreateAccountPayload'
-      produces:
-      - application/vnd.goa.error
-      - application/vnd.goa.error
-      - application/vnd.account+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Account'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: create Account
-      tags:
-      - Account
-  /account/{id}:
-    delete:
-      description: delete
-      operationId: Account#delete
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/DeleteAccountPayload'
-      produces:
-      - application/vnd.goa.error
-      - application/vnd.goa.error
-      - application/vnd.account+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Account'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: delete Account
-      tags:
-      - Account
-    get:
-      description: show
-      operationId: Account#show
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: name
-        in: query
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/vnd.goa.error
-      - application/vnd.goa.error
-      - application/vnd.account+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Account'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: show Account
-      tags:
-      - Account
-    put:
-      description: update
-      operationId: Account#update
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/UpdateAccountPayload'
-      produces:
-      - application/vnd.goa.error
-      - application/vnd.goa.error
-      - application/vnd.account+json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Account'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: update Account
-      tags:
-      - Account
   /swagger.json:
     get:
       operationId: swagger#/swagger.json
@@ -302,16 +140,223 @@ paths:
       schemes:
       - http
       summary: Download ../static/swagger/
+  /users:
+    get:
+      description: list
+      operationId: User#list
+      parameters:
+      - description: name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.user+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: list User
+      tags:
+      - User
+    post:
+      description: create
+      operationId: User#create
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: create User
+      tags:
+      - User
+  /users/{id}:
+    delete:
+      description: delete
+      operationId: User#delete
+      parameters:
+      - description: id(int64)
+        in: path
+        name: id
+        required: true
+        type: any
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: delete User
+      tags:
+      - User
+    get:
+      description: show
+      operationId: User#show
+      parameters:
+      - description: id(int64)
+        in: path
+        name: id
+        required: true
+        type: any
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: show User
+      tags:
+      - User
+    put:
+      description: update
+      operationId: User#update
+      parameters:
+      - description: id(int64)
+        in: path
+        name: id
+        required: true
+        type: any
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.goa.error
+      - application/vnd.user+json
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: update User
+      tags:
+      - User
 produces:
 - application/json
 - application/xml
 - application/gob
 - application/x-gob
-responses:
-  OK:
-    description: OK
-    schema:
-      $ref: '#/definitions/Account'
 schemes:
 - http
 swagger: "2.0"

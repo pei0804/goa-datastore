@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	goaclient "github.com/goadesign/goa/client"
+	"github.com/pei0804/goa-datastore/client"
+	"github.com/pei0804/goa-datastore/tool/cli"
 	"github.com/spf13/cobra"
-	"github.com/tikasan/goa-datastore/client"
-	"github.com/tikasan/goa-datastore/tool/cli"
 	"net/http"
 	"os"
 	"time"

@@ -4,8 +4,8 @@
 //
 // Command:
 // $ goagen
-// --design=github.com/tikasan/goa-datastore/design
-// --out=$(GOPATH)/src/github.com/tikasan/goa-datastore
+// --design=github.com/pei0804/goa-datastore/design
+// --out=$(GOPATH)/src/github.com/pei0804/goa-datastore
 // --version=v1.2.0-dirty
 
 package app
